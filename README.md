@@ -1,3 +1,3 @@
-# task-manager
-# task-manager
-# task-manager
+sure scoop is installed
+composer install
+symfony serve -d
