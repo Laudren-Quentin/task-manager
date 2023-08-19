@@ -1,3 +1,6 @@
-sure scoop is installed
+Scoop installed ?
+
 composer install
+
+Lancer le server :
 symfony serve -d
