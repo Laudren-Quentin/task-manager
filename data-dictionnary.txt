@@ -1,0 +1,35 @@
+Utilisateur :
+
+Nom de l'utilisateur
+Prénom de l'utilisateur
+Mail de l'utilisateur
+Mot de passe de l'utilisateur (haché)
+Rôle de l'utilisateur (administrateur, créateur de projet, membre)
+
+
+Projet :
+
+Nom du projet
+Date de début du projet
+Date de fin du projet
+Statut du projet (en cours, terminé)
+Créateur du projet (relation avec l'entité Utilisateur)
+
+
+Tâche :
+
+Nom de la tâche
+Description de la tâche
+Ordre de la tâche dans le projet
+Temps estimé pour la tâche
+Date de début de la tâche
+Date de fin de la tâche
+Statut de la tâche (en cours, terminée)
+Projet auquel appartient la tâche (relation avec l'entité Projet)
+Utilisateur assigné à la tâche (relation avec l'entité Utilisateur)
+
+
+Groupe d'utilisateurs :
+
+Nom du groupe
+Liste des utilisateurs faisant partie du groupe
