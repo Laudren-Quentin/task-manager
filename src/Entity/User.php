@@ -29,20 +29,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'band')]
-    private Collection $ParticipatingProjects;
-
-    #[ORM\OneToMany(mappedBy: 'creator_id', targetEntity: Task::class)]
-    private Collection $tasksCreated;
-
-    #[ORM\OneToMany(mappedBy: 'ueserID', targetEntity: Task::class)]
-    private Collection $AssignedTasks;
-
     public function __construct()
     {
-        $this->ParticipatingProjects = new ArrayCollection();
-        $this->tasksCreated = new ArrayCollection();
-        $this->AssignedTasks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -113,94 +101,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
-    }
-
-    
-
-    /**
-     * @return Collection<int, Project>
-     */
-    public function getParticipatingProjects(): Collection
-    {
-        return $this->ParticipatingProjects;
-    }
-
-    public function addParticipatingProject(Project $participatingProject): static
-    {
-        if (!$this->ParticipatingProjects->contains($participatingProject)) {
-            $this->ParticipatingProjects->add($participatingProject);
-            $participatingProject->addBand($this);
-        }
-
-        return $this;
-    }
-
-    public function removeParticipatingProject(Project $participatingProject): static
-    {
-        if ($this->ParticipatingProjects->removeElement($participatingProject)) {
-            $participatingProject->removeBand($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Task>
-     */
-    public function getTasksCreated(): Collection
-    {
-        return $this->tasksCreated;
-    }
-
-    public function addTasksCreated(Task $tasksCreated): static
-    {
-        if (!$this->tasksCreated->contains($tasksCreated)) {
-            $this->tasksCreated->add($tasksCreated);
-            $tasksCreated->setCreatorId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTasksCreated(Task $tasksCreated): static
-    {
-        if ($this->tasksCreated->removeElement($tasksCreated)) {
-            // set the owning side to null (unless already changed)
-            if ($tasksCreated->getCreatorId() === $this) {
-                $tasksCreated->setCreatorId(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Task>
-     */
-    public function getAssignedTasks(): Collection
-    {
-        return $this->AssignedTasks;
-    }
-
-    public function addAssignedTask(Task $assignedTask): static
-    {
-        if (!$this->AssignedTasks->contains($assignedTask)) {
-            $this->AssignedTasks->add($assignedTask);
-            $assignedTask->setUeserID($this);
-        }
-
-        return $this;
-    }
-
-    public function removeAssignedTask(Task $assignedTask): static
-    {
-        if ($this->AssignedTasks->removeElement($assignedTask)) {
-            // set the owning side to null (unless already changed)
-            if ($assignedTask->getUeserID() === $this) {
-                $assignedTask->setUeserID(null);
-            }
-        }
-
-        return $this;
     }
 }
