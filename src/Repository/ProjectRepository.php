@@ -29,12 +29,15 @@ class ProjectRepository extends ServiceEntityRepository
     public function findProjectsByTeamMember(User $user)
     {
         return $this->createQueryBuilder('p')
-            ->leftJoin('p.team', 't')
-            ->andWhere('t.id = :userId')
+            ->select('p', '(SELECT COUNT(t1) FROM App\Entity\Task t1 WHERE t1.project = p) AS totalTasks', '(SELECT COUNT(t2) FROM App\Entity\Task t2 WHERE t2.project = p AND t2.completed = true) AS completedTasks', 'COUNT(u) AS teamSize')
+            ->leftJoin('p.team', 'u')
+            ->andWhere('u.id = :userId')
             ->setParameter('userId', $user->getId())
+            ->groupBy('p.id')
             ->getQuery()
             ->getResult();
     }
+
 
     /**
      * @param User $user The user who created the projects
@@ -43,36 +46,12 @@ class ProjectRepository extends ServiceEntityRepository
     public function findProjectsCreatedByUser(User $user): array
     {
         return $this->createQueryBuilder('p')
+            ->select('p', '(SELECT COUNT(t1) FROM App\Entity\Task t1 WHERE t1.project = p) AS totalTasks', '(SELECT COUNT(t2) FROM App\Entity\Task t2 WHERE t2.project = p AND t2.completed = true) AS completedTasks', 'COUNT(u) AS teamSize')
+            ->leftJoin('p.team', 'u')
             ->where('p.creator = :user')
             ->setParameter('user', $user)
+            ->groupBy('p.id')
             ->getQuery()
             ->getResult();
     }
-
-
-
-//    /**
-//     * @return Project[] Returns an array of Project objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Project
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }
