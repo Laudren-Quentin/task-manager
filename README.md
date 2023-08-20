@@ -1,3 +1,6 @@
-# task-manager
-# task-manager
-# task-manager
+Scoop installed ?
+
+composer install
+
+Lancer le server :
+symfony serve -d
