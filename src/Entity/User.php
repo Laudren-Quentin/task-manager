@@ -29,8 +29,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
+    #[ORM\OneToMany(mappedBy: 'creator', targetEntity: Project::class)]
+    private Collection $CreatedProjects;
+
+    #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'team')]
+    private Collection $projects;
+
+    #[ORM\OneToMany(mappedBy: 'creator', targetEntity: Task::class)]
+    private Collection $CreatedTasks;
+
+    #[ORM\OneToMany(mappedBy: 'assignedUser', targetEntity: Task::class)]
+    private Collection $AssignedTasks;
+
     public function __construct()
     {
+        $this->CreatedProjects = new ArrayCollection();
+        $this->projects = new ArrayCollection();
+        $this->CreatedTasks = new ArrayCollection();
+        $this->AssignedTasks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -101,5 +117,122 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection<int, Project>
+     */
+    public function getCreatedProjects(): Collection
+    {
+        return $this->CreatedProjects;
+    }
+
+    public function addCreatedProject(Project $createdProject): static
+    {
+        if (!$this->CreatedProjects->contains($createdProject)) {
+            $this->CreatedProjects->add($createdProject);
+            $createdProject->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCreatedProject(Project $createdProject): static
+    {
+        if ($this->CreatedProjects->removeElement($createdProject)) {
+            // set the owning side to null (unless already changed)
+            if ($createdProject->getCreator() === $this) {
+                $createdProject->setCreator(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Project>
+     */
+    public function getProjects(): Collection
+    {
+        return $this->projects;
+    }
+
+    public function addProject(Project $project): static
+    {
+        if (!$this->projects->contains($project)) {
+            $this->projects->add($project);
+            $project->addTeam($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProject(Project $project): static
+    {
+        if ($this->projects->removeElement($project)) {
+            $project->removeTeam($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Task>
+     */
+    public function getCreatedTasks(): Collection
+    {
+        return $this->CreatedTasks;
+    }
+
+    public function addCreatedTask(Task $createdTask): static
+    {
+        if (!$this->CreatedTasks->contains($createdTask)) {
+            $this->CreatedTasks->add($createdTask);
+            $createdTask->setCreator($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCreatedTask(Task $createdTask): static
+    {
+        if ($this->CreatedTasks->removeElement($createdTask)) {
+            // set the owning side to null (unless already changed)
+            if ($createdTask->getCreator() === $this) {
+                $createdTask->setCreator(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Task>
+     */
+    public function getAssignedTasks(): Collection
+    {
+        return $this->AssignedTasks;
+    }
+
+    public function addAssignedTask(Task $assignedTask): static
+    {
+        if (!$this->AssignedTasks->contains($assignedTask)) {
+            $this->AssignedTasks->add($assignedTask);
+            $assignedTask->setAssignedUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAssignedTask(Task $assignedTask): static
+    {
+        if ($this->AssignedTasks->removeElement($assignedTask)) {
+            // set the owning side to null (unless already changed)
+            if ($assignedTask->getAssignedUser() === $this) {
+                $assignedTask->setAssignedUser(null);
+            }
+        }
+
+        return $this;
     }
 }
