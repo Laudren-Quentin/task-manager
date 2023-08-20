@@ -1,23 +1,31 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Les Projets{% endblock %}
+{% block title %}Les Projets
+{% endblock %}
 
 {% block body %}
 
-<div class="example-wrapper">
-    <h1>Les Projets</h1>
-     <ul>
-        {% for project in projects %}
-            <li class="project-card">
-                <h2>{{ project[0].title }}</h2>
-                <p>Nombre de membres dans l'équipe : {{ project['teamSize'] }}</p>
-                <p>Nombre total de tâches : {{ project['totalTasks'] }}</p>
-                <p>Nombre de tâches complétées : {{ project['completedTasks'] }}</p>
-                <p>Pourcentage de tâches complétées : {% if project['totalTasks'] > 0 %}{{ (project['completedTasks'] / project['totalTasks']) * 100 }}{% else %}0{% endif %}%</p>
-                <p>Date de mise à jour : {{ project[0].updatedAt|date('d/m/Y H:i') }}</p>
-            </li>
-        {% endfor %}
-    </ul>
+	<div class="example-wrapper">
+		<h1>Les Projets</h1>
+		<ul>
+			{% for project in projects %}
+				<li class="project-card">
+					<h2>{{ project[0].title }}</h2>
+					<p>Nombre de membres dans l'équipe :
+						{{ project['teamSize'] }}</p>
+					<p>Nombre total de tâches :
+						{{ project['totalTasks'] }}</p>
+					<p>Nombre de tâches complétées :
+						{{ project['completedTasks'] }}</p>
+					<p>Pourcentage de tâches complétées :
+						{% if project['totalTasks'] > 0 %}
+							{{ ((project['completedTasks'] / project['totalTasks']) * 100)|number_format(2) }}{% else %}0
+						{% endif %}%</p>
+					<p>Date de mise à jour :
+						{{ project[0].updatedAt|date('d/m/Y H:i') }}</p>
+				</li>
+			{% endfor %}
+		</ul>
 
-</div>
+	</div>
 {% endblock %}
