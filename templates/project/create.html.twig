@@ -29,6 +29,35 @@
         
         const existingParticipants = [];
 
+        function createTeamMember(email) {
+            const newMemberField = document.createElement('div');
+            newMemberField.classList.add('team-member');
+            newMemberField.textContent = email;
+            
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.classList.add('remove-member-btn');
+            removeButton.textContent = 'Supprimer';
+            removeButton.dataset.email = email;
+            
+            removeButton.addEventListener('click', () => {
+                // Remove the email from the existingParticipants array
+                const index = existingParticipants.indexOf(email);
+                if (index !== -1) {
+                    existingParticipants.splice(index, 1);
+                }
+                
+                // Update the hidden input value
+                participantsInput.value = existingParticipants.join(',');
+                
+                // Remove the team member element from the container
+                newMemberField.remove();
+            });
+            
+            newMemberField.appendChild(removeButton);
+            teamMembersContainer.appendChild(newMemberField);
+        }
+
         addNewMemberBtn.addEventListener('click', () => {
             const email = newMemberInput.value;
 
@@ -49,11 +78,8 @@
                         // Update the hidden input value
                         participantsInput.value = existingParticipants.join(',');
 
-                        // Create a new div for the team member
-                        const newMemberField = document.createElement('div');
-                        newMemberField.classList.add('team-member');
-                        newMemberField.textContent = email;
-                        teamMembersContainer.appendChild(newMemberField);
+                        // Create a new div for the team member with remove button
+                        createTeamMember(email);
 
                         // Clear the input
                         newMemberInput.value = '';
