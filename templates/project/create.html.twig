@@ -1,15 +1,71 @@
-{# templates/project/create.html.twig #}
-
-{% extends 'base.html.twig' %}
-
-{% block title %}Créer un projet{% endblock %}
+{# project/create.html.twig #}
 
 {% block body %}
-    <h1>Créer un projet</h1>
-
+    <h1>Créer un nouveau projet</h1>
     {{ form_start(form) }}
-        {{ form_widget(form) }}
-        
-        <button type="submit">Créer</button>
+    {{ form_row(form.title) }}
+
+    <h3>Participants</h3>
+    <div id="team-members">
+        {# Existing team members here #}
+    </div>
+
+    <h3>Ajouter un membre</h3>
+    <div id="add-member-input">
+        <input type="email" id="new-member" placeholder="Adresse e-mail">
+        <button type="button" id="add-new-member">Ajouter</button>
+    </div>
+
+    <input type="hidden" name="participants" id="participants-input" value="">
+    
+    <button type="submit">Créer le projet</button>
     {{ form_end(form) }}
+
+    <script>
+        const addNewMemberBtn = document.getElementById('add-new-member');
+        const newMemberInput = document.getElementById('new-member');
+        const teamMembersContainer = document.getElementById('team-members');
+        const participantsInput = document.getElementById('participants-input');
+        
+        const existingParticipants = [];
+
+        addNewMemberBtn.addEventListener('click', () => {
+            const email = newMemberInput.value;
+
+            // Check if email is already in the existingParticipants array
+            if (existingParticipants.includes(email)) {
+                alert('L\'utilisateur est déjà dans la liste des participants.');
+                return;
+            }
+
+            // Send AJAX request to check if the user exists
+            fetch('{{ path('app_check_user') }}?email=' + email)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        // Add email to existingParticipants list
+                        existingParticipants.push(email);
+
+                        // Update the hidden input value
+                        participantsInput.value = existingParticipants.join(',');
+
+                        // Create a new div for the team member
+                        const newMemberField = document.createElement('div');
+                        newMemberField.classList.add('team-member');
+                        newMemberField.textContent = email;
+                        teamMembersContainer.appendChild(newMemberField);
+
+                        // Clear the input
+                        newMemberInput.value = '';
+                    } else {
+                        // Display an error message or handle the case when the user doesn't exist
+                        alert('L\'utilisateur n\'existe pas');
+                    }
+                })
+                .catch(error => {
+                    // Handle errors from the AJAX request
+                    console.error('Error:', error);
+                });
+        });
+    </script>
 {% endblock %}

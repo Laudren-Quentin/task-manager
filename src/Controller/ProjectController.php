@@ -4,10 +4,13 @@ namespace App\Controller;
 
 use App\Entity\Project;
 use App\Form\CreateProjectType;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Annotation\Route;
+
 
 class ProjectController extends AbstractController
 {
@@ -20,20 +23,23 @@ class ProjectController extends AbstractController
     }
 
     #[Route('/project/create', name: 'app_create_project')]
-    #[Security('is_granted("ROLE_ADMIN")')]
-    public function createProject(Request $request): Response
+    public function createProject(EntityManagerInterface $entityManager ,Request $request, UserRepository $userRepository): Response
     {
         $project = new Project();
         $form = $this->createForm(CreateProjectType::class, $project);
+
         $form->handleRequest($request);
 
+
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            
+
+            // Retrieve the participants from the hidden input field
+            $participants = $request->request->get('participants');
+            $participantEmails = explode(',', $participants);
+
             // Process team members' emails and add them to the project's team
-            $emails = $form->get('team')->getData();
-            foreach ($emails as $email) {
-                $user = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
+            foreach ($participantEmails as $email) {
+                $user = $userRepository->findOneBy(['email' => $email]);
                 if ($user) {
                     $project->addTeam($user);
                 }
@@ -53,7 +59,6 @@ class ProjectController extends AbstractController
 
             // Rediriger ou afficher un message de succès
             return $this->redirectToRoute('app_home');
-
         }
 
         return $this->render('project/create.html.twig', [
