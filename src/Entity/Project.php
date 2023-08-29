@@ -22,7 +22,7 @@ class Project
     #[ORM\JoinColumn(nullable: false)]
     private ?User $creator = null;
 
-    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'projects')]
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'projects', cascade: ['persist'])]
     private Collection $team;
 
     #[ORM\Column]
@@ -31,7 +31,7 @@ class Project
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\OneToMany(mappedBy: 'project', targetEntity: Task::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'project', targetEntity: Task::class, cascade: ['persist'], orphanRemoval: true)]
     private Collection $tasks;
 
     public function __construct()

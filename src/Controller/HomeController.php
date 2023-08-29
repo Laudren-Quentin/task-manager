@@ -29,7 +29,6 @@ class HomeController extends AbstractController
          if (in_array('ROLE_ADMIN', $user->getRoles())) {
             // Get projects created by the user (ROLE_ADMIN)
             $projects = $this->projectRepository->findProjectsCreatedByUser($user);
-
             // dd($projects);
         } else {
             // Get projects where the user is a team member

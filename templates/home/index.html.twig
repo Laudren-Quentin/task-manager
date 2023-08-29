@@ -8,24 +8,24 @@
 	<div class="example-wrapper">
 		<h1>Les Projets</h1>
 		<ul>
-			{% for project in projects %}
-				<li class="project-card">
-					<h2>{{ project[0].title }}</h2>
-					<p>Nombre de membres dans l'équipe :
-						{{ project['teamSize'] }}</p>
-					<p>Nombre total de tâches :
-						{{ project['totalTasks'] }}</p>
-					<p>Nombre de tâches complétées :
-						{{ project['completedTasks'] }}</p>
-					<p>Pourcentage de tâches complétées :
-						{% if project['totalTasks'] > 0 %}
-							{{ ((project['completedTasks'] / project['totalTasks']) * 100)|number_format(2) }}{% else %}0
-						{% endif %}%</p>
-					<p>Date de mise à jour :
-						{{ project[0].updatedAt|date('d/m/Y H:i') }}</p>
-				</li>
-			{% endfor %}
-		</ul>
+            {% for project in projects %}
+                <li class="project-card">
+                    <a href="{{ path('app_project_details', {'id': project[0].id}) }}">
+                        <h2>{{ project[0].title }}</h2>
+                    </a>
+                    <p>Nombre de membres dans l'équipe : {{ project['teamSize'] }}</p>
+                    <p>Nombre total de tâches : {{ project['totalTasks'] }}</p>
+                    <p>Nombre de tâches complétées : {{ project['completedTasks'] }}</p>
+                    <p>Pourcentage de tâches complétées :
+                        {% if project['totalTasks'] > 0 %}
+                            {{ ((project['completedTasks'] / project['totalTasks']) * 100)|number_format(2) }}{% else %}0
+                        {% endif %}%
+                    </p>
+                    <p>Date de mise à jour : {{ project[0].updatedAt|date('d/m/Y H:i') }}</p>
+                    <p>Auteur : {{ project[0].creator.email }}</p>
+                </li>
+            {% endfor %}
+        </ul>
 
 	</div>
 {% endblock %}

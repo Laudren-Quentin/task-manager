@@ -4,17 +4,20 @@ namespace App\Controller;
 
 use App\Entity\Project;
 use App\Form\CreateProjectType;
+use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-
+use Symfony\Component\VarDumper\VarDumper;
 
 class ProjectController extends AbstractController
 {
-    #[Route('/project', name: 'app_project')]
+    /**
+     * @Route("/project", name="app_project")
+     */
     public function index(): Response
     {
         return $this->render('project/index.html.twig', [
@@ -22,8 +25,10 @@ class ProjectController extends AbstractController
         ]);
     }
 
-    #[Route('/project/create', name: 'app_create_project')]
-    public function createProject(EntityManagerInterface $entityManager ,Request $request, UserRepository $userRepository): Response
+    /**
+     * @Route("/project/create", name="app_create_project")
+     */
+    public function createProject(EntityManagerInterface $entityManager, Request $request, UserRepository $userRepository): Response
     {
         $project = new Project();
         $form = $this->createForm(CreateProjectType::class, $project);
@@ -63,6 +68,22 @@ class ProjectController extends AbstractController
 
         return $this->render('project/create.html.twig', [
             'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/project/{id}", name="app_project_details")
+     */
+    public function showDetails($id, ProjectRepository $projectRepository): Response
+    {
+        // Fetch the project details based on the ID
+        $project = $projectRepository->findProjectById($id);
+        VarDumper::dump($project);
+
+        // Add any additional logic to prepare data for the template
+
+        return $this->render('project/detail.html.twig', [
+            'project' => $project,
         ]);
     }
 }
