@@ -13,7 +13,7 @@ class Project
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    public ?int $id = null;
 
     #[ORM\Column(length: 255)]
     private ?string $title = null;

@@ -1,11 +1,39 @@
-{% extends 'base.html.twig' %}
+{# templates/project/detail.html.twig #}
 
-{% block title %}Détails du Projet{% endblock %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Project Details</title>
+</head>
+<body>
+    <h1>Project Details</h1>
+    
+    <h2>{{ project.title }}</h2>
+    
+    <h3>Team Members:</h3>
+    <ul>
+        {% for user in project.team %}
+            <li>{{ user.email }}</li>
+        {% endfor %}
+    </ul>
+    
+     <h3>Tâches :</h3>
 
-{% block body %}
-    <div class="example-wrapper">
-        <h1>Détails du Projet</h1>
-        <h2>{{ project[0].title }}</h2>
-        <!-- Display other project details here -->
+     <a href="{{ path('app_create_task', {'id': project.id}) }}" class="btn btn-primary">Créer une nouvelle tâche</a>
+    <div class="task-cards">
+        {% for task in project.tasks %}
+            <div class="task-card">
+                <h4>{{ task.title }}</h4>
+                <p>{{ task.description }}</p>
+                <p>
+                    {% if task.assignedUser %}
+                        Assigned to: {{ task.assignedUser.email }}
+                    {% else %}
+                        Not Assigned
+                    {% endif %}
+                </p>
+            </div>
+        {% endfor %}
     </div>
-{% endblock %}
+</body>
+</html>

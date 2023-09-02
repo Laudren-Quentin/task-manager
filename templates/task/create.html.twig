@@ -1,0 +1,14 @@
+{# templates/task/create.html.twig #}
+
+{% extends 'base.html.twig' %}
+
+{% block body %}
+	<h1>Create Task</h1>
+
+	{{ form_start(form) }}
+
+	{# Vos champs de formulaire ici #}
+
+	<button type="submit" class="btn btn-primary">Créer</button>
+	{{ form_end(form) }}
+{% endblock %}

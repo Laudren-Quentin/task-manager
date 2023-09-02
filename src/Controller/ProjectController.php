@@ -77,7 +77,9 @@ class ProjectController extends AbstractController
     public function showDetails($id, ProjectRepository $projectRepository): Response
     {
         // Fetch the project details based on the ID
-        $project = $projectRepository->findProjectById($id);
+        $project = $projectRepository->findProjectByIdWithTeamAndTasks($id);
+        $project = $project[0];
+
         VarDumper::dump($project);
 
         // Add any additional logic to prepare data for the template

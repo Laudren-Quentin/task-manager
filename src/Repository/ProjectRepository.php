@@ -56,16 +56,37 @@ class ProjectRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findProjectById(int $id): array
-{
-   return $this->createQueryBuilder('p')
-        ->leftJoin('p.team', 't')
-        ->addSelect('t') // Load the 'team' collection explicitly
-        ->leftJoin('p.tasks', 'ts')
-        ->addSelect('ts') // Load the 'tasks' collection explicitly
-        ->where('p.id = :id')
-        ->setParameter('id', $id)
-        ->getQuery()
-        ->getResult();
-}
+    public function findProjectById(int $id): ?Project
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findProjectByIdWithTeam(int $id): array
+    {
+        return $this->createQueryBuilder('p')
+            ->leftJoin('p.team', 't')
+            ->addSelect('t') // Load the 'team' collection explicitly
+            ->where('p.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getResult();
+    }
+
+
+    public function findProjectByIdWithTeamAndTasks(int $id): array
+    {
+        return $this->createQueryBuilder('p')
+            ->leftJoin('p.team', 't')
+            ->addSelect('t') // Load the 'team' collection explicitly
+            ->leftJoin('p.tasks', 'ts')
+            ->addSelect('ts') // Load the 'tasks' collection explicitly
+            ->where('p.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getResult();
+    }
 }
