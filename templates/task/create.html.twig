@@ -3,12 +3,29 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-	<h1>Create Task</h1>
+    <h1>Create Task</h1>
 
-	{{ form_start(form) }}
+    {{ form_start(form) }}
+    
+    {# Titre de la tâche #}
+    <div class="form-group">
+        {{ form_label(form.title) }}
+        {{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}
+    </div>
 
-	{# Vos champs de formulaire ici #}
+    {# Description de la tâche #}
+    <div class="form-group">
+        {{ form_label(form.description) }}
+        {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+    </div>
 
-	<button type="submit" class="btn btn-primary">Créer</button>
-	{{ form_end(form) }}
+    {# Sélection de l'utilisateur (optionnel) #}
+    <div class="form-group">
+        {{ form_label(form.assignedUser) }}
+        {{ form_widget(form.assignedUser, {'attr': {'class': 'form-control'}}) }}
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Créer</button>
+    
+    {{ form_end(form) }}
 {% endblock %}
