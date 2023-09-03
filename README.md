@@ -20,7 +20,7 @@ Chose à faire :
   USER
 - l'utilisateur peut consulter les projets auquels il fait parti
 - l'utilisateur peut consulter les tâches associées à un projet
-- L'utilisateur à qui la tache a été assigné doit pouvoir validé cette dernière quand il l'a terminé
+- L'utilisateur à qui la tache a été assigné doit pouvoir validé cette dernière quand il l'a terminé ✅
 
   ADMIN
 - les admins peuvent créer des comptes ( admin et user ) ✅
