@@ -7,6 +7,12 @@
 		<div class="order-2">
 			<h3 class="mb-4 mt-4">Membres de l'équipe</h3>
 			<ul class="list-group">
+				<li class="list-group-item d-flex justify-content-between">
+					<div>
+						<i class="fa-solid fa-crown"></i>
+						{{ project.creator.email }}
+					</div>
+				</li>
 				{% for user in project.team %}
 					<li class="list-group-item d-flex justify-content-between member-user">
 						<div>
@@ -71,7 +77,7 @@
 									Terminé
 								{% else %}
 									{% if task.assignedUser ==  app.user %}
-										<button class="btn btn-success">
+										<button class="btn btn-success validate-task-button" data-task-id="{{ task.id }}">
 											Valider la tâche
 										</button>
 									{% else %}
@@ -111,9 +117,15 @@
  <script>
  // Supression d'une task :
 			document.addEventListener('DOMContentLoaded', function() {
-		    const deleteButtons = document.querySelectorAll('.delete-task-button');
+		   
+		});
+        // -----------------------------------------------------------------------------------------------------------
+        // Create // Delete d'un membre de l'équipe
+         document.addEventListener('DOMContentLoaded', function() {
+
+        const deleteTaskButtons = document.querySelectorAll('.delete-task-button');
 		
-		    deleteButtons.forEach(button => {
+		deleteTaskButtons.forEach(button => {
 		        button.addEventListener('click', function() {
 		            const taskId = button.getAttribute('data-task-id');
 		            const deleteUrl = `/task/delete/${taskId}`;
@@ -146,16 +158,30 @@
 		            }
 		        });
 		    });
-		});
-        // -----------------------------------------------------------------------------------------------------------
-        // Create // Delete d'un membre de l'équipe
-         document.addEventListener('DOMContentLoaded', function() {
+
+        const validateTaskButtons = document.querySelectorAll('.validate-task-button');
+        validateTaskButtons.forEach(button => {
+            button.addEventListener('click', function() {
+            const taskId = button.getAttribute('data-task-id');
+                if (confirm('Voulez vous valider la tâche en cours ?')) {
+                    fetch(`/task/validate/${taskId}`)
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            location.reload();
+                        } else {
+                           alert(result.message);
+                        }
+                    });
+                }
+            });
+        });
+
         const addUserForm = document.getElementById('addUserForm');
         const emailInput = document.getElementById('email');
         const addUserButton = document.getElementById('addUserButton');
         const projectId = {{ project.id }}; // Remplacez ceci par le moyen d'obtenir l'ID du projet
 
-        const removeUserButtons = document.querySelectorAll('.remove-user-button');
 
         addUserButton.addEventListener('click', function() {
             var regex = /[^\s@]+@[^\s@]+\.[^\s@]+/; // regex de mail
@@ -180,10 +206,12 @@
             }
         });
 
+        const removeUserButtons = document.querySelectorAll('.remove-user-button');
         removeUserButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const userEmail = button.getAttribute('data-user-email');
                 const projectId = {{ project.id }};
+                 if (confirm('Êtes-vous sûr de vouloir enlever cet utilisateur du grouppe ?')) {
                 fetch(`/remove-user-from-project/${projectId}?email=${userEmail}`)
                     .then(response => response.json())
                     .then(result => {
@@ -196,6 +224,7 @@
                            alert(result.message);
                         }
                     });
+                 }
             });
         });
     });

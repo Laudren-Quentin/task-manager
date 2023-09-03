@@ -61,7 +61,7 @@ class TaskController extends AbstractController
         $project = $projectRepository->find($projectId);
         $task = $entityManager->getRepository(Task::class)->find($taskId);
 
-        if($task->getCreator() != $this->getUser()){
+        if ($task->getCreator() != $this->getUser()) {
             throw $this->createNotFoundException('Vous ne pouvez pas modifier cette tâche');
         }
         // Check si la tâche appartient au projet
@@ -99,5 +99,21 @@ class TaskController extends AbstractController
         }
 
         return new JsonResponse(['message' => 'Tâche supprimée avec succès'], 200);
+    }
+
+    /**
+     * @Route("/task/validate/{taskId}", name="validateTask")
+     */
+    public function validateTask(int $taskId, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $task = $entityManager->getRepository(Task::class)->find($taskId);
+        if (!$task) {
+            return new JsonResponse(['success' => false, 'message' => 'La tâche n\'existe pas.']);
+        }elseif($task->getAssignedUser() != $this->getUser()){
+            return new JsonResponse(['success' => false, 'message' => 'Vous ne pouvez pas valider une tâche qui ne vous est pas assigné']);
+        }
+        $task->setCompleted(true);
+        $entityManager->flush();
+        return new JsonResponse(['success' => true]);
     }
 }
