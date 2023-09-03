@@ -3,53 +3,130 @@
 {% block body %}
 
 	<h2>{{ project.title }}</h2>
-
-	<h3>Team Members:</h3>
-	<ul>
-		{% for user in project.team %}
-			<li>{{ user.email }}</li>
-		{% endfor %}
-	</ul>
-
-	<h3>Tâches :</h3>
-
-	<a href="{{ path('app_create_task', {'id': project.id}) }}" title="Ajouter une tâche" class="btn btn-primary"><i class="fa-solid fa-plus"></i></a>
-	<div class="task-cards">
-		{% for task in project.tasks %}
-			<div class="card">
-				<h4 class="card-header">{{ task.title }}</h4>
-				<p>{{ task.description }}</p>
-				<p>
-					{% if task.completed %}
-						<span class="completed">Completed</span>
-					{% else %}
-						<span class="not-completed">Not Completed</span>
-					{% endif %}
-				</p>
-				<p>
-					{% if task.assignedUser %}
-						Assigned to:
-						{{ task.assignedUser.email }}
-					{% else %}
-						Not Assigned
-					{% endif %}
-				</p>
-				<div class="d-flex justify-content-between">
-					<p>Créé le :
-						{{ task.createdAt|date('d-m-Y') }}</p>
-					{% if task.createdAt != task.updatedAt %}
-						<p>Modifié le :
-							{{ task.updatedAt|date('d-m-Y') }}</p>
-					{% endif %}
-				</div>
-
-				{% if task.creator == app.user %}
-					<p>
-						<a {# href="{{ path('edit_task', {'id': task.id}) }}" #} class="btn btn-warning" title="Modifier la tâche"><i class="fa-solid fa-pen"></i></a>
-						<a {# href="{{ path('delete_task', {'id': task.id}) }}" #} class="btn btn-danger" title="Supprimer la tâche"><i class="fa-solid fa-xmark"></i></a>
-					</p>
-				{% endif %}
+	<div class="container d-flex justify-content-between">
+		<div class="order-2">
+			<h3 class="m-4">Membres de l'équipe</h3>
+			<ul class="list-group">
+				{% for user in project.team %}
+					<li class="list-group-item d-flex justify-content-between">
+						<div>
+							<i class="fas fa-user"></i>
+							{{ user.email }}
+						</div>
+						{# TODO: SI CRéATEUR IL PEUT Supprimer DES MEMBRES #}
+						<a href="" class="btn btn-danger btn-sm" title="Supprimer la tâche">
+							<i class="fas fa-trash"></i>
+						</a>
+					</li>
+				{% endfor %}
+				<li
+					class="list-group-item">
+					{# TODO: SI CRéATEUR IL PEUT AJOUTER DES MEMBRES #}
+					<a href="" title="Ajouter un membre de l'équipe" class="btn btn-primary">
+						<i class="fa-solid fa-plus"></i>
+					</a>
+				</li>
+			</ul>
+		</div>
+		<div class="col-8">
+			<div class="d-flex justify-content-between align-items-center">
+				<h3>Tâches :</h3>
+				<a href="{{ path('app_create_task', {'id': project.id}) }}" title="Ajouter une tâche" class="btn btn-primary m-4">
+					<i class="fa-solid fa-plus"></i>
+				</a>
 			</div>
-		{% endfor %}
+			<div class="task-cards">
+				{% for task in project.tasks %}
+					<div class="card mb-3">
+						<div class="card-header d-flex justify-content-between align-items-center">
+							<h4 class="mb-0">{{ task.title }}</h4>
+							{% if task.creator == app.user %}
+								<div class="btn-group" role="group">
+									<a href="" class="btn btn-warning btn-sm" title="Modifier la tâche">
+										<i class="fas fa-edit"></i>
+									</a>
+									<button type="button" class="btn btn-danger delete-task-button" data-task-id="{{ task.id }}">Supprimer la tâche</button>
+								</div>
+							{% endif %}
+						</div>
+
+						<div class="card-body">
+							<p>{{ task.description }}</p>
+							<p>
+								Status :
+								{% if task.completed %}
+									<i class="fas fa-check-circle text-success"></i>
+									Terminé
+								{% else %}
+									<i class="fas fa-spinner fa-spin text-warning"></i>
+									En attente
+								{% endif %}
+							</p>
+							<p>
+								{% if task.assignedUser %}
+									<i class="fas fa-user text-primary"></i>
+									Assigné à :
+									{{ task.assignedUser.email }}
+								{% else %}
+									<i class="fas fa-user-times text-danger"></i>
+									Non assigné
+								{% endif %}
+							</p>
+						</div>
+
+						<div class="card-footer d-flex justify-content-between">
+							<p class="mb-0">Créé le :
+								{{ task.createdAt|date('d-m-Y') }}</p>
+							{% if task.createdAt != task.updatedAt %}
+								<p class="mb-0">Modifié le :
+									{{ task.updatedAt|date('d-m-Y') }}</p>
+							{% endif %}
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+		</div>
 	</div>
+
+
+	 <script>
+		   document.addEventListener('DOMContentLoaded', function() {
+	    const deleteButtons = document.querySelectorAll('.delete-task-button');
+	
+	    deleteButtons.forEach(button => {
+	        button.addEventListener('click', function() {
+	            const taskId = button.getAttribute('data-task-id');
+	            const deleteUrl = `/task/delete/${taskId}`;
+	
+	            // Utilisez la fonction confirm pour demander une confirmation à l'utilisateur
+	            if (confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) {
+	                fetch(deleteUrl, {
+	                    method: 'DELETE',
+	                    headers: {
+	                        'Content-Type': 'application/json',
+	                    },
+	                })
+	                .then(response => {
+	                    if (response.status === 200) {
+	                        // La tâche a été supprimée avec succès, vous pouvez afficher une alerte de succès
+	                        alert('Tâche supprimée avec succès');
+	                        // Vous pouvez également recharger la page pour refléter les modifications
+	                        location.reload();
+	                    } else {
+	                        // En cas d'erreur, affichez une alerte d'erreur avec le message de réponse
+	                        response.text().then(message => {
+	                            alert('Erreur lors de la suppression de la tâche : ' + message);
+	                        });
+	                    }
+	                })
+	                .catch(error => {
+	                    console.error('Erreur lors de la suppression de la tâche :', error);
+	                    alert('Une erreur s\'est produite lors de la suppression de la tâche.');
+	                });
+	            }
+	        });
+	    });
+	});
+	</script>
+
 {% endblock %}

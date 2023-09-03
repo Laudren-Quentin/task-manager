@@ -31,7 +31,7 @@ class Task
 
     #[ORM\ManyToOne(inversedBy: 'tasks')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?project $project = null;
+    private ?Project $project = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;

@@ -6,11 +6,14 @@ use App\Entity\Project;
 use App\Entity\Task;
 use App\Form\TaskType;
 use App\Repository\ProjectRepository;
+use App\Repository\TaskRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\VarDumper\VarDumper;
 
@@ -35,16 +38,16 @@ class TaskController extends AbstractController
         $form = $this->createForm(TaskType::class, $task);
         $form->handleRequest($request);
         VarDumper::dump($form);
-        
+
         if ($form->isSubmitted() && $form->isValid()) {
-            
-             // Set createdAt and updatedAt
-             $now = new \DateTimeImmutable();
-             $task->setCreatedAt($now);
-             $task->setUpdatedAt($now);
- 
-             $entityManager->persist($task);
-             $entityManager->flush();
+
+            // Set createdAt and updatedAt
+            $now = new \DateTimeImmutable();
+            $task->setCreatedAt($now);
+            $task->setUpdatedAt($now);
+
+            $entityManager->persist($task);
+            $entityManager->flush();
 
             return $this->redirectToRoute('app_project_details', ['id' => $id]);
         }
@@ -52,5 +55,23 @@ class TaskController extends AbstractController
         return $this->render('task/create.html.twig', [
             'form' => $form->createView(),
         ]);
+    }
+
+    /**
+     * @Route("/task/delete/{id}", name="app_delete_task", methods={"DELETE"})
+     */
+    public function delete(int $id, EntityManagerInterface $entityManager,  UserInterface $user): JsonResponse
+    {
+        // Récupérez la tâche à supprimer depuis la base de données
+        $task = $entityManager->getRepository(Task::class)->find($id);
+        // VarDumper::dump($task);
+        if ($task->getCreator() == $this->getUser()) {
+            $entityManager->remove($task);
+            $entityManager->flush();
+        }else{
+            throw new AccessDeniedException('Vous n\'êtes pas autorisé à supprimer cette tâche.');
+        }
+
+        return new JsonResponse(['message' => 'Tâche supprimée avec succès'], 200);
     }
 }
