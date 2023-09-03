@@ -60,7 +60,7 @@ class TaskController extends AbstractController
     /**
      * @Route("/task/delete/{id}", name="app_delete_task", methods={"DELETE"})
      */
-    public function delete(int $id, EntityManagerInterface $entityManager,  UserInterface $user): JsonResponse
+    public function delete(int $id, EntityManagerInterface $entityManager): JsonResponse
     {
         // Récupérez la tâche à supprimer depuis la base de données
         $task = $entityManager->getRepository(Task::class)->find($id);

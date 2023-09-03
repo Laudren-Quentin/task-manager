@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\VarDumper\VarDumper;
 
@@ -87,5 +88,45 @@ class ProjectController extends AbstractController
         return $this->render('project/detail.html.twig', [
             'project' => $project,
         ]);
+    }
+
+    /**
+     * @Route("/add-user-to-project/{projectId}", name="addUserToProject")
+     */
+    public function addUserToProject(int $projectId, Request $request, UserRepository $userRepository, ProjectRepository $projectRepository, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $email = $_GET['email'];
+        // Vérifiez si l'utilisateur existe dans la base de données
+        $user = $userRepository->findOneBy(['email' => $email]);
+
+        if (!$user) {
+            // Si l'utilisateur n'existe pas, renvoyez une réponse JSON avec une indication d'échec
+            return new JsonResponse(['success' => false, 'message' => 'L\'utilisateur n\'existe pas.']);
+        }
+
+        // Récupérez le projet
+        $project = $projectRepository->find($projectId);
+
+        if (!$project) {
+            // Si le projet n'existe pas, renvoyez une réponse JSON avec une indication d'échec
+            return new JsonResponse(['success' => false, 'message' => 'Le projet n\'existe pas.']);
+        } elseif ($project->getCreator() != $this->getUser()) {
+            return new JsonResponse(['success' => false, 'message' => 'Vous n\'ête pas le créateur du projet.']);
+        }
+
+        // Vérifiez si l'utilisateur est déjà associé au projet
+        if ($project->getTeam()->contains($user)) {
+            // Si l'utilisateur est déjà associé au projet, renvoyez une réponse JSON avec une indication d'échec
+            return new JsonResponse(['success' => false, 'message' => 'L\'utilisateur est déjà dans le groupe.']);
+        }
+
+        // Ajoutez ici la logique pour ajouter l'utilisateur au projet
+        // Par exemple, en mettant à jour la relation entre le projet et l'utilisateur
+        $project->addTeam($user);
+        $entityManager->persist($project);
+        $entityManager->flush();
+
+        // Renvoyez une réponse JSON indiquant le succès de l'opération
+        return new JsonResponse(['success' => true]);
     }
 }

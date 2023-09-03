@@ -46,9 +46,12 @@ class AppFixtures extends Fixture
 
         // Create some categories
         $categories = ['Urgent', 'Modéré', 'Neutre'];
+        $categoriesAdded = [];
         foreach ($categories as $categoryLabel) {
             $category = new Category();
             $category->setLabel($categoryLabel);
+
+            $categoriesAdded[] = $category;
             $manager->persist($category);
         }
 
@@ -85,6 +88,11 @@ class AppFixtures extends Fixture
                 }
                 // Mark 1 task out of 5 as completed, others as not completed
                 $task->setCompleted($j % 5 === 0);
+
+                // Choose a random category from $categoriesAdded
+                $randomCategory = $categoriesAdded[array_rand($categoriesAdded)];
+                $task->setCategory($randomCategory);
+
                 $manager->persist($task);
             }
         }

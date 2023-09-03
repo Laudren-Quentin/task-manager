@@ -19,6 +19,11 @@
         {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
     </div>
 
+     <div class="form-group">
+        {{ form_label(form.category) }}
+        {{ form_widget(form.category, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
     {# Sélection de l'utilisateur (optionnel) #}
     <div class="form-group">
         {{ form_label(form.assignedUser) }}

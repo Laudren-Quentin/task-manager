@@ -84,6 +84,8 @@ class ProjectRepository extends ServiceEntityRepository
             ->addSelect('t') // Load the 'team' collection explicitly
             ->leftJoin('p.tasks', 'ts')
             ->addSelect('ts') // Load the 'tasks' collection explicitly
+            ->leftJoin('ts.category', 'c')
+            ->addSelect('c') // Charger explicitement la collection 'category' liée à la tâche
             ->where('p.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
