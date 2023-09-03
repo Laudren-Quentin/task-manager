@@ -4,7 +4,6 @@ namespace App\Form;
 
 use App\Entity\Project;
 use App\Entity\Task;
-use App\Entity\User;
 use App\Entity\Category; 
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
@@ -61,11 +60,9 @@ class TaskType extends AbstractType
     private function getUserChoices(Project $project)
     {
         $userChoices = [];
-
         foreach ($project->getTeam() as $user) {
             $userChoices[$user->getEmail()] = $user;
         }
-
         return $userChoices;
     }
 }
