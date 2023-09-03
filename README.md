@@ -24,8 +24,8 @@ Chose à faire :
 
   ADMIN
 - les admins peuvent créer des comptes ( admin et user ) ✅
-- Les admins peuvent créer des projets
-- les admins peuvent consulter les projets qu'ils ont créés
-- les admins peuvent ajouter des utilisateur au projet créé
-- les admins peuvent suprimer des utilisateur à un de leurs projets
-- les admins peuvent créer des tâches et les assigner à des utilisateurs associé au projet
+- Les admins peuvent créer des projets ✅
+- les admins peuvent consulter les projets qu'ils ont créés ✅
+- les admins peuvent ajouter des utilisateur au projet créé ✅
+- les admins peuvent suprimer des utilisateur à un de leurs projets ✅
+- les admins peuvent créer des tâches et les assigner à des utilisateurs associé au projet ✅
