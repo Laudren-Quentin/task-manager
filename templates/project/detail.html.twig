@@ -13,7 +13,7 @@
 
 	<h3>Tâches :</h3>
 
-	<a href="{{ path('app_create_task', {'id': project.id}) }}" class="btn btn-primary">Créer une nouvelle tâche</a>
+	<a href="{{ path('app_create_task', {'id': project.id}) }}" title="Ajouter une tâche" class="btn btn-primary"><i class="fa-solid fa-plus"></i></a>
 	<div class="task-cards">
 		{% for task in project.tasks %}
 			<div class="card">
@@ -45,8 +45,8 @@
 
 				{% if task.creator == app.user %}
 					<p>
-						<a {# href="{{ path('edit_task', {'id': task.id}) }}" #} class="btn btn-warning">Modifier</a>
-						<a {# href="{{ path('delete_task', {'id': task.id}) }}" #} class="btn btn-danger">Supprimer</a>
+						<a {# href="{{ path('edit_task', {'id': task.id}) }}" #} class="btn btn-warning" title="Modifier la tâche"><i class="fa-solid fa-pen"></i></a>
+						<a {# href="{{ path('delete_task', {'id': task.id}) }}" #} class="btn btn-danger" title="Supprimer la tâche"><i class="fa-solid fa-xmark"></i></a>
 					</p>
 				{% endif %}
 			</div>
