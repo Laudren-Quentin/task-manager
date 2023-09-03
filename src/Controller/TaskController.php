@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Project;
 use App\Entity\Task;
 use App\Form\TaskType;
 use App\Repository\ProjectRepository;
@@ -53,32 +54,30 @@ class TaskController extends AbstractController
 
 
     /**
-     * @Route("/project/{id}/create-task", name="app_edit_task")
+     * @Route("/project/{projectId}/edit-task/{taskId}", name="app_edit_task")
      */
-    public function editTask($id, Request $request, ProjectRepository $projectRepository, UserInterface $user, EntityManagerInterface $entityManager): Response
+    public function editTask($projectId, $taskId, Request $request, ProjectRepository $projectRepository, UserInterface $user, EntityManagerInterface $entityManager): Response
     {
-        // Récupérez le projet associé à l'ID fourni avec toutes les informations nécéssaire 
-        $project = $projectRepository->findProjectById($id);
-        VarDumper::dump($project);
+        $project = $projectRepository->find($projectId);
+        $task = $entityManager->getRepository(Task::class)->find($taskId);
 
-        // Créez une nouvelle tâche liée au projet
-        $task = new Task();
-        $task->setProject($project);
-        $task->setCreator($user); // Le créateur de la tâche est l'utilisateur connecté
-        $task->setCompleted(false);
-
+        if($task->getCreator() != $this->getUser()){
+            throw $this->createNotFoundException('Vous ne pouvez pas modifier cette tâche');
+        }
+        // Check si la tâche appartient au projet
+        if (!$task || $task->getProject() !== $project) {
+            throw $this->createNotFoundException('Tâche non trouvée');
+        }
         $form = $this->createForm(TaskType::class, $task);
         $form->handleRequest($request);
-        VarDumper::dump($form);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $now = new \DateTimeImmutable();
-            $task->setCreatedAt($now);
             $task->setUpdatedAt($now);
-
             $entityManager->persist($task);
             $entityManager->flush();
-            return $this->redirectToRoute('app_project_details', ['id' => $id]);
+
+            return $this->redirectToRoute('app_project_details', ['id' => $projectId]);
         }
         return $this->render('task/edit.html.twig', [
             'form' => $form->createView(),
@@ -95,7 +94,7 @@ class TaskController extends AbstractController
         if ($task->getCreator() == $this->getUser()) {
             $entityManager->remove($task);
             $entityManager->flush();
-        }else{
+        } else {
             throw new AccessDeniedException('Vous n\'êtes pas autorisé à supprimer cette tâche.');
         }
 
