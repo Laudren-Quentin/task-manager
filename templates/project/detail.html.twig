@@ -2,22 +2,22 @@
 {% extends 'base.html.twig' %}
 {% block body %}
 
-	<h2>{{ project.title }}</h2>
+	<h2 class="text-center bg-secondary p-4 text-light">{{ project.title }}</h2>
 	<div class="container d-flex justify-content-between">
 		<div class="order-2">
-			<h3 class="m-4">Membres de l'équipe</h3>
+			<h3 class="mb-4 mt-4">Membres de l'équipe</h3>
 			<ul class="list-group">
 				{% for user in project.team %}
-					<li class="list-group-item d-flex justify-content-between">
+					<li class="list-group-item d-flex justify-content-between member-user">
 						<div>
 							<i class="fas fa-user"></i>
 							{{ user.email }}
 						</div>
 						{% if project.creator == app.user %}
-							{# TODO: SI CRéATEUR IL PEUT Supprimer DES MEMBRES #}
-							<a href="" class="btn btn-danger btn-sm" title="Supprimer la tâche">
+							<button class="btn btn-danger btn-sm remove-user-button" data-user-email="{{ user.email }}" title="Supprimer l'utilisateur">
 								<i class="fas fa-trash"></i>
-							</a>
+							</button>
+
 						{% endif %}
 					</li>
 				{% endfor %}
@@ -35,7 +35,7 @@
 		</div>
 		<div class="col-8">
 			<div class="d-flex justify-content-between align-items-center">
-				<h3>Tâches :</h3>
+				<h3 class="mb-4 mt-4">Tâches :</h3>
 				{% if project.creator == app.user %}
 					<a href="{{ path('app_create_task', {'id': project.id}) }}" title="Ajouter une tâche" class="btn btn-primary m-4">
 						<i class="fa-solid fa-plus"></i>
@@ -146,20 +146,19 @@
 		    });
 		});
         // -----------------------------------------------------------------------------------------------------------
-
-        // Ajout d'un utilisateur
+        // Create // Delete d'un membre de l'équipe
          document.addEventListener('DOMContentLoaded', function() {
         const addUserForm = document.getElementById('addUserForm');
         const emailInput = document.getElementById('email');
         const addUserButton = document.getElementById('addUserButton');
         const projectId = {{ project.id }}; // Remplacez ceci par le moyen d'obtenir l'ID du projet
 
+        const removeUserButtons = document.querySelectorAll('.remove-user-button');
+
         addUserButton.addEventListener('click', function() {
-            var regex = /[^\s@]+@[^\s@]+\.[^\s@]+/;
+            var regex = /[^\s@]+@[^\s@]+\.[^\s@]+/; // regex de mail
             const email = emailInput.value;
             if(email !== "" && regex.test(email)){
-            // Effectuer une requête AJAX pour vérifier si l'utilisateur existe
-                    // L'utilisateur existe, vous pouvez maintenant l'ajouter au groupe
                     fetch(`/add-user-to-project/${projectId}?email=${email}`, {
                         method: 'POST',
                     })
@@ -178,5 +177,26 @@
                 alert('Il faut rentrer une addresse mail');
             }
         });
+
+        removeUserButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const userEmail = button.getAttribute('data-user-email');
+                const projectId = {{ project.id }};
+                fetch(`/remove-user-from-project/${projectId}?email=${userEmail}`)
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            // L'utilisateur a été ajouté avec succès, vous pouvez mettre à jour la liste des membres de l'équipe
+                            alert('L\'utilisateur supprimé avec succès du groupe.');
+                            // Rechargez ou mettez à jour la liste des membres de l'équipe ici
+                            location.reload();
+                        } else {
+                           alert(result.message);
+                        }
+                    });
+            });
+        });
     });
+
+
 	</script>{% endblock %}

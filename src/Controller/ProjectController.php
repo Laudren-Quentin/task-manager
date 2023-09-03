@@ -129,4 +129,33 @@ class ProjectController extends AbstractController
         // Renvoyez une réponse JSON indiquant le succès de l'opération
         return new JsonResponse(['success' => true]);
     }
+
+    /**
+     * @Route("/remove-user-from-project/{projectId}", name="removeUserFromProject")
+     */
+    public function removeUserFromProject(int $projectId,  UserRepository $userRepository, ProjectRepository $projectRepository, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $email = $_GET['email'];
+        // récupère l'utilisateur
+        $user = $userRepository->findOneBy(['email' => $email]);
+        // Récupère le projet
+        $project = $projectRepository->find($projectId);
+
+        if (!$project) {
+            return new JsonResponse(['success' => false, 'message' => 'Le projet n\'existe pas.']);
+        } elseif ($project->getCreator() != $this->getUser()) {
+            return new JsonResponse(['success' => false, 'message' => 'Vous n\'êtes pas le créateur du projet.']);
+        }
+
+        if (!$user) {
+            return new JsonResponse(['success' => false, 'message' => 'L\'utilisateur n\'existe pas.']);
+        }
+
+        // Supprimez l'utilisateur de la liste d'équipe
+        $project->removeTeam($user);
+        $entityManager->persist($project);
+        $entityManager->flush();
+
+        return new JsonResponse(['success' => true]);
+    }
 }
