@@ -77,9 +77,9 @@ class ProjectRepository extends ServiceEntityRepository
     }
 
 
-    public function findProjectByIdWithTeamAndTasks(int $id): array
+    public function findProjectByIdWithTeamAndTasks(int $id, $taskType, $user): array
     {
-        return $this->createQueryBuilder('p')
+        $qb = $this->createQueryBuilder('p')
             ->leftJoin('p.team', 't')
             ->addSelect('t') // Load the 'team' collection explicitly
             ->leftJoin('p.tasks', 'ts')
@@ -87,8 +87,27 @@ class ProjectRepository extends ServiceEntityRepository
             ->leftJoin('ts.category', 'c')
             ->addSelect('c') // Charger explicitement la collection 'category' liée à la tâche
             ->where('p.id = :id')
-            ->setParameter('id', $id)
-            ->getQuery()
-            ->getResult();
+            ->setParameter('id', $id);
+           
+        switch ($taskType) {
+            case 'myTasks':
+                // Ajoutez une condition pour ne récupérer que les tâches de l'utilisateur actuellement connecté
+                $qb->andWhere('ts.assignedUser = :currentUser')
+                    ->setParameter('currentUser', $user);
+                break;
+            case 'allTasks':
+                // Aucune condition supplémentaire nécessaire
+                break;
+            case 'completedTasks':
+                // Ajoutez une condition pour ne récupérer que les tâches terminées
+                $qb->andWhere('ts.completed = :completed')
+                    ->setParameter('completed', true);
+                break;
+                // Vous pouvez ajouter d'autres cas ici pour différents types de tâches
+            default:
+                // Par défaut, ne rien faire de spécial
+                break;
+        }
+        return $qb->orderBy('ts.completed', 'ASC')->addOrderBy('c.id', 'ASC')->getQuery()->getResult();
     }
 }

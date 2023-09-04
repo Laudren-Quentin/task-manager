@@ -5,41 +5,66 @@
 	<h2 class="text-center bg-secondary p-4 text-light">{{ project.title }}</h2>
 	<div class="container d-flex justify-content-between">
 		<div class="order-2">
-			<h3 class="mb-4 mt-4">Membres de l'équipe</h3>
-			<ul class="list-group">
-				<li class="list-group-item d-flex justify-content-between">
-					<div>
-						<i class="fa-solid fa-crown"></i>
-						{{ project.creator.email }}
-					</div>
-				</li>
-				{% for user in project.team %}
-					<li class="list-group-item d-flex justify-content-between member-user">
+			<div class="users_member">
+				<h3 class="mb-4 mt-4">Membres de l'équipe</h3>
+				<ul class="list-group">
+					<li class="list-group-item d-flex justify-content-between">
 						<div>
-							<i class="fas fa-user"></i>
-							{{ user.email }}
+							<i class="fa-solid fa-crown"></i>
+							{{ project.creator.email }}
 						</div>
-						{% if project.creator == app.user %}
-							<button class="btn btn-danger btn-sm remove-user-button" data-user-email="{{ user.email }}" title="Supprimer l'utilisateur">
-								<i class="fas fa-trash"></i>
-							</button>
-
-						{% endif %}
 					</li>
-				{% endfor %}
-				{% if project.creator == app.user %}
-					<li class="list-group-item">
-						<form id="addUserForm" class="d-flex align-items-center">
-							<div class="form-group">
-								<input type="text" class="form-control" id="email" name="email" placeholder="e-mail de l'utilisateur">
+					{% for user in project.team %}
+						<li class="list-group-item d-flex justify-content-between member-user">
+							<div>
+								<i class="fas fa-user"></i>
+								{{ user.email }}
 							</div>
-							<button type="button" class="btn btn-primary m-2" id="addUserButton" title="ajouter un utilisateur">
-								<i class="fa-solid fa-plus"></i>
-							</button>
-						</form>
+							{% if project.creator == app.user %}
+								<button class="btn btn-danger btn-sm remove-user-button" data-user-email="{{ user.email }}" title="Supprimer l'utilisateur">
+									<i class="fas fa-trash"></i>
+								</button>
+
+							{% endif %}
+						</li>
+					{% endfor %}
+					{% if project.creator == app.user %}
+						<li class="list-group-item">
+							<form id="addUserForm" class="d-flex align-items-center">
+								<div class="form-group">
+									<input type="text" class="form-control" id="email" name="email" placeholder="e-mail de l'utilisateur">
+								</div>
+								<button type="button" class="btn btn-primary m-2" id="addUserButton" title="ajouter un utilisateur">
+									<i class="fa-solid fa-plus"></i>
+								</button>
+							</form>
+						</li>
+					{% endif %}
+				</ul>
+			</div>
+			<div>
+				<h3 class="mb-4 mt-4">Options</h3>
+				<ul class="list-group">
+					<li class="list-group-item d-flex justify-content-between">
+						<a href="{{ path('app_project_details', {'id': project.id, 'taskType': 'allTasks'}) }}" class="nav-link">Toutes les tâches</a>
 					</li>
-				{% endif %}
-			</ul>
+					<li class="list-group-item d-flex justify-content-between">
+						<a href="{{ path('app_project_details', {'id': project.id, 'taskType': 'myTasks'}) }}" class="nav-link">Mes tâches</a>
+					</li>
+					<li class="list-group-item d-flex justify-content-between">
+						<a href="{{ path('app_project_details', {'id': project.id, 'taskType': 'completedTasks'}) }}" class="nav-link">Les tâches terminées</a>
+					</li>
+				</ul>
+			</div>
+			<div>
+				<h3 class="mb-4 mt-4">Légende</h3>
+				<ul class="list-group">
+					<li class="list-group-item d-flex justify-content-between bg-danger text-light">Urgent</li>
+					<li class="list-group-item d-flex justify-content-between bg-warning text-light">Modéré</li>
+					<li class="list-group-item d-flex justify-content-between bg-primary text-light">Neutre</li>
+					<li class="list-group-item d-flex justify-content-between bg-secondary text-light">Terminé</li>
+				</ul>
+			</div>
 		</div>
 		<div class="col-8">
 			<div class="d-flex justify-content-between align-items-center">
@@ -53,7 +78,7 @@
 			<div class="task-cards">
 				{% for task in project.tasks %}
 					<div class="card mb-3">
-						<div class="card-header d-flex justify-content-between align-items-center {{ task.category.label == 'Urgent' ? 'bg-danger' : (task.category.label == 'Modéré' ? 'bg-warning' : 'bg-primary') }}">
+						<div class="card-header d-flex justify-content-between align-items-center {{ task.completed ? 'bg-secondary'  : task.category.label == 'Urgent' ? 'bg-danger' : (task.category.label == 'Modéré' ? 'bg-warning' : 'bg-primary') }}">
 
 							<h4 class="mb-0 text-light">{{ task.title }}</h4>
 							{% if task.creator == app.user %}
@@ -115,119 +140,119 @@
 
 
  <script>
- // Supression d'une task :
-			document.addEventListener('DOMContentLoaded', function() {
-		   
-		});
-        // -----------------------------------------------------------------------------------------------------------
-        // Create // Delete d'un membre de l'équipe
-         document.addEventListener('DOMContentLoaded', function() {
-
-        const deleteTaskButtons = document.querySelectorAll('.delete-task-button');
-		
-		deleteTaskButtons.forEach(button => {
-		        button.addEventListener('click', function() {
-		            const taskId = button.getAttribute('data-task-id');
-		            const deleteUrl = `/task/delete/${taskId}`;
-		
-		            // Utilisez la fonction confirm pour demander une confirmation à l'utilisateur
-		            if (confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) {
-		                fetch(deleteUrl, {
-		                    method: 'DELETE',
-		                    headers: {
-		                        'Content-Type': 'application/json',
-		                    },
-		                })
-		                .then(response => {
-		                    if (response.status === 200) {
-		                        // La tâche a été supprimée avec succès, vous pouvez afficher une alerte de succès
-		                        alert('Tâche supprimée avec succès');
-		                        // Vous pouvez également recharger la page pour refléter les modifications
-		                        location.reload();
-		                    } else {
-		                        // En cas d'erreur, affichez une alerte d'erreur avec le message de réponse
-		                        response.text().then(message => {
-		                            alert('Erreur lors de la suppression de la tâche : ' + message);
-		                        });
-		                    }
-		                })
-		                .catch(error => {
-		                    console.error('Erreur lors de la suppression de la tâche :', error);
-		                    alert('Une erreur s\'est produite lors de la suppression de la tâche.');
-		                });
-		            }
-		        });
-		    });
-
-        const validateTaskButtons = document.querySelectorAll('.validate-task-button');
-        validateTaskButtons.forEach(button => {
-            button.addEventListener('click', function() {
-            const taskId = button.getAttribute('data-task-id');
-                if (confirm('Voulez vous valider la tâche en cours ?')) {
-                    fetch(`/task/validate/${taskId}`)
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.success) {
-                            location.reload();
-                        } else {
-                           alert(result.message);
-                        }
-                    });
-                }
-            });
-        });
-
-        const addUserForm = document.getElementById('addUserForm');
-        const emailInput = document.getElementById('email');
-        const addUserButton = document.getElementById('addUserButton');
-        const projectId = {{ project.id }}; // Remplacez ceci par le moyen d'obtenir l'ID du projet
-
-
-        addUserButton.addEventListener('click', function() {
-            var regex = /[^\s@]+@[^\s@]+\.[^\s@]+/; // regex de mail
-            const email = emailInput.value;
-            if(email !== "" && regex.test(email)){
-                    fetch(`/add-user-to-project/${projectId}?email=${email}`, {
-                        method: 'POST',
-                    })
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.success) {
-                            // L'utilisateur a été ajouté avec succès, vous pouvez mettre à jour la liste des membres de l'équipe
-                            alert('Utilisateur ajouté avec succès au groupe.');
-                            // Rechargez ou mettez à jour la liste des membres de l'équipe ici
-                            location.reload();
-                        } else {
-                           alert(result.message);
-                        }
-                    });
-            }else{
-                alert('Il faut rentrer une addresse mail');
-            }
-        });
-
-        const removeUserButtons = document.querySelectorAll('.remove-user-button');
-        removeUserButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const userEmail = button.getAttribute('data-user-email');
-                const projectId = {{ project.id }};
-                 if (confirm('Êtes-vous sûr de vouloir enlever cet utilisateur du grouppe ?')) {
-                fetch(`/remove-user-from-project/${projectId}?email=${userEmail}`)
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.success) {
-                            // L'utilisateur a été ajouté avec succès, vous pouvez mettre à jour la liste des membres de l'équipe
-                            alert('L\'utilisateur supprimé avec succès du groupe.');
-                            // Rechargez ou mettez à jour la liste des membres de l'équipe ici
-                            location.reload();
-                        } else {
-                           alert(result.message);
-                        }
-                    });
-                 }
-            });
-        });
-    });
-
-
-	</script>{% endblock %}
+					        // Supression d'une task :
+								document.addEventListener('DOMContentLoaded', function() {
+							   
+							});
+					        // -----------------------------------------------------------------------------------------------------------
+					        // Create // Delete d'un membre de l'équipe
+					         document.addEventListener('DOMContentLoaded', function() {
+					
+					        const deleteTaskButtons = document.querySelectorAll('.delete-task-button');
+							
+							deleteTaskButtons.forEach(button => {
+							        button.addEventListener('click', function() {
+							            const taskId = button.getAttribute('data-task-id');
+							            const deleteUrl = `/task/delete/${taskId}`;
+							
+							            // Utilisez la fonction confirm pour demander une confirmation à l'utilisateur
+							            if (confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) {
+							                fetch(deleteUrl, {
+							                    method: 'DELETE',
+							                    headers: {
+							                        'Content-Type': 'application/json',
+							                    },
+							                })
+							                .then(response => {
+							                    if (response.status === 200) {
+							                        // La tâche a été supprimée avec succès, vous pouvez afficher une alerte de succès
+							                        alert('Tâche supprimée avec succès');
+							                        // Vous pouvez également recharger la page pour refléter les modifications
+							                        location.reload();
+							                    } else {
+							                        // En cas d'erreur, affichez une alerte d'erreur avec le message de réponse
+							                        response.text().then(message => {
+							                            alert('Erreur lors de la suppression de la tâche : ' + message);
+							                        });
+							                    }
+							                })
+							                .catch(error => {
+							                    console.error('Erreur lors de la suppression de la tâche :', error);
+							                    alert('Une erreur s\'est produite lors de la suppression de la tâche.');
+							                });
+							            }
+							        });
+							    });
+					
+					        const validateTaskButtons = document.querySelectorAll('.validate-task-button');
+					        validateTaskButtons.forEach(button => {
+					            button.addEventListener('click', function() {
+					            const taskId = button.getAttribute('data-task-id');
+					                if (confirm('Voulez vous valider la tâche en cours ?')) {
+					                    fetch(`/task/validate/${taskId}`)
+					                    .then(response => response.json())
+					                    .then(result => {
+					                        if (result.success) {
+					                            location.reload();
+					                        } else {
+					                           alert(result.message);
+					                        }
+					                    });
+					                }
+					            });
+					        });
+					
+					        const addUserForm = document.getElementById('addUserForm');
+					        const emailInput = document.getElementById('email');
+					        const addUserButton = document.getElementById('addUserButton');
+					        const projectId = {{ project.id }}; // Remplacez ceci par le moyen d'obtenir l'ID du projet
+					
+					
+					        addUserButton.addEventListener('click', function() {
+					            var regex = /[^\s@]+@[^\s@]+\.[^\s@]+/; // regex de mail
+					            const email = emailInput.value;
+					            if(email !== "" && regex.test(email)){
+					                    fetch(`/add-user-to-project/${projectId}?email=${email}`, {
+					                        method: 'POST',
+					                    })
+					                    .then(response => response.json())
+					                    .then(result => {
+					                        if (result.success) {
+					                            // L'utilisateur a été ajouté avec succès, vous pouvez mettre à jour la liste des membres de l'équipe
+					                            alert('Utilisateur ajouté avec succès au groupe.');
+					                            // Rechargez ou mettez à jour la liste des membres de l'équipe ici
+					                            location.reload();
+					                        } else {
+					                           alert(result.message);
+					                        }
+					                    });
+					            }else{
+					                alert('Il faut rentrer une addresse mail');
+					            }
+					        });
+					
+					        const removeUserButtons = document.querySelectorAll('.remove-user-button');
+					        removeUserButtons.forEach(button => {
+					            button.addEventListener('click', function() {
+					                const userEmail = button.getAttribute('data-user-email');
+					                const projectId = {{ project.id }};
+					                 if (confirm('Êtes-vous sûr de vouloir enlever cet utilisateur du grouppe ?')) {
+					                fetch(`/remove-user-from-project/${projectId}?email=${userEmail}`)
+					                    .then(response => response.json())
+					                    .then(result => {
+					                        if (result.success) {
+					                            // L'utilisateur a été ajouté avec succès, vous pouvez mettre à jour la liste des membres de l'équipe
+					                            alert('L\'utilisateur supprimé avec succès du groupe.');
+					                            // Rechargez ou mettez à jour la liste des membres de l'équipe ici
+					                            location.reload();
+					                        } else {
+					                           alert(result.message);
+					                        }
+					                    });
+					                 }
+					            });
+					        });
+					    });
+					
+					
+						</script>{% endblock %}

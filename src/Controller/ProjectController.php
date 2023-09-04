@@ -63,9 +63,11 @@ class ProjectController extends AbstractController
     /**
      * @Route("/project/{id}", name="app_project_details")
      */
-    public function showDetails($id, ProjectRepository $projectRepository): Response
+    public function showDetails($id, ProjectRepository $projectRepository, Request $request): Response
     {
-        $project = $projectRepository->findProjectByIdWithTeamAndTasks($id);
+        $taskType = $request->query->get('taskType', 'allTasks'); // Par défaut, afficher "Mes tâches"
+        $user = $this->getUser();
+        $project = $projectRepository->findProjectByIdWithTeamAndTasks($id, $taskType, $user);
         $project = $project[0];
         VarDumper::dump($project);
         return $this->render('project/detail.html.twig', [
@@ -76,7 +78,7 @@ class ProjectController extends AbstractController
     /**
      * @Route("/add-user-to-project/{projectId}", name="addUserToProject")
      */
-    public function addUserToProject(int $projectId, Request $request, UserRepository $userRepository, ProjectRepository $projectRepository, EntityManagerInterface $entityManager): JsonResponse
+    public function addUserToProject(int $projectId, UserRepository $userRepository, ProjectRepository $projectRepository, EntityManagerInterface $entityManager): JsonResponse
     {
         // Récupère le projet
         $project = $projectRepository->find($projectId);
