@@ -1,0 +1,34 @@
+<h3 class="mb-4 mt-4">Membres de l'équipe</h3>
+<ul class="list-group">
+    <li class="list-group-item d-flex justify-content-between">
+        <div>
+            <i class="fa-solid fa-crown"></i>
+            {{ project.creator.email }}
+        </div>
+    </li>
+    {% for user in project.team %}
+        <li class="list-group-item d-flex justify-content-between member-user">
+            <div>
+                <i class="fas fa-user"></i>
+                {{ user.email }}
+            </div>
+            {% if project.creator == app.user %}
+                <button class="btn btn-danger btn-sm remove-user-button" data-user-email="{{ user.email }}" title="Supprimer l'utilisateur">
+                    <i class="fas fa-trash"></i>
+                </button>
+            {% endif %}
+        </li>
+    {% endfor %}
+    {% if project.creator == app.user %}
+        <li class="list-group-item">
+            <form id="addUserForm" class="d-flex align-items-center">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="email" name="email" placeholder="e-mail de l'utilisateur">
+                </div>
+                <button type="button" class="btn btn-primary m-2" id="addUserButton" title="ajouter un utilisateur">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+            </form>
+        </li>
+    {% endif %}
+</ul>

@@ -1,0 +1,12 @@
+<h3 class="mb-4 mt-4">Options</h3>
+<ul class="list-group">
+    <li class="list-group-item d-flex justify-content-between">
+        <a href="{{ path('app_project_details', {'id': project.id, 'taskType': 'allTasks'}) }}" class="nav-link">Toutes les tâches</a>
+    </li>
+    <li class="list-group-item d-flex justify-content-between">
+        <a href="{{ path('app_project_details', {'id': project.id, 'taskType': 'myTasks'}) }}" class="nav-link">Mes tâches</a>
+    </li>
+    <li class="list-group-item d-flex justify-content-between">
+        <a href="{{ path('app_project_details', {'id': project.id, 'taskType': 'completedTasks'}) }}" class="nav-link">Les tâches terminées</a>
+    </li>
+</ul>
