@@ -27,16 +27,28 @@ class ProjectRepository extends ServiceEntityRepository
      * @param User $user The user who's in Team Member Project
      * @return Project[] Returns an array of Project objects
      */
-    public function findProjectsByTeamMember(User $user)
+    public function findProjectsByTeamMember(User $user, $projectType) : array
     {
-        return $this->createQueryBuilder('p')
+        $qb = $this->createQueryBuilder('p')
             ->select('p', '(SELECT COUNT(t1) FROM App\Entity\Task t1 WHERE t1.project = p) AS totalTasks', '(SELECT COUNT(t2) FROM App\Entity\Task t2 WHERE t2.project = p AND t2.completed = true) AS completedTasks', 'COUNT(u) AS teamSize')
             ->leftJoin('p.team', 'u')
             ->andWhere('u.id = :userId')
             ->setParameter('userId', $user->getId())
-            ->groupBy('p.id')
-            ->getQuery()
-            ->getResult();
+            ->groupBy('p.id');
+            switch ($projectType) {
+                case 'new-projects':
+                    $qb->orderBy('p.updatedAt', 'DESC');
+                    break;
+                case 'old-projects':
+                    $qb->orderBy('p.updatedAt', 'ASC');
+                    break;
+                default:
+                    $qb->orderBy('p.updatedAt', 'DESC');
+                    break;
+            }
+        
+            return $qb->getQuery()->getResult();
+        
     }
 
 
@@ -44,16 +56,27 @@ class ProjectRepository extends ServiceEntityRepository
      * @param User $user The user who created the projects
      * @return Project[] Returns an array of Project objects
      */
-    public function findProjectsCreatedByUser(User $user): array
+    public function findProjectsCreatedByUser(User $user, $projectType): array
     {
-        return $this->createQueryBuilder('p')
+        $qb = $this->createQueryBuilder('p')
             ->select('p', '(SELECT COUNT(t1) FROM App\Entity\Task t1 WHERE t1.project = p) AS totalTasks', '(SELECT COUNT(t2) FROM App\Entity\Task t2 WHERE t2.project = p AND t2.completed = true) AS completedTasks', 'COUNT(u) AS teamSize')
             ->leftJoin('p.team', 'u')
             ->where('p.creator = :user')
             ->setParameter('user', $user)
-            ->groupBy('p.id')
-            ->getQuery()
-            ->getResult();
+            ->groupBy('p.id');
+            switch ($projectType) {
+                case 'new-projects':
+                    $qb->orderBy('p.updatedAt', 'DESC');
+                    break;
+                case 'old-projects':
+                    $qb->orderBy('p.updatedAt', 'ASC');
+                    break;
+                default:
+                    $qb->orderBy('p.updatedAt', 'DESC');
+                    break;
+            }
+        
+            return $qb->getQuery()->getResult();
     }
 
     public function findProjectById(int $id): ?Project

@@ -32,11 +32,11 @@ class HomeController extends AbstractController
          if (in_array('ROLE_ADMIN', $user->getRoles())) {
             // Get projects created by the user (ROLE_ADMIN)
             $projects = $this->projectRepository->findProjectsCreatedByUser($user, $projectType);
-            // dd($projects);
         } else {
             // Get projects where the user is a team member
             $projects = $this->projectRepository->findProjectsByTeamMember($user, $projectType);
         }
+        dd($projects);
 
         return $this->render('home/index.html.twig', [
             'projects' => $projects,

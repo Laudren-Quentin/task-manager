@@ -13,18 +13,10 @@
 					<h3 class="mb-4 mt-4">Filtres</h3>
 					<ul class="list-group">
 						<li class="list-group-item d-flex justify-content-between">
-							<a href="{{ path('app_home', {'ProjectType': 'newProjects'}) }}" class="nav-link">Les plus récents</a>
-						</li>
-						{% if is_granted('ROLE_ADMIN') %}
-							<li class="list-group-item d-flex justify-content-between">
-								<a href="{{ path('app_home', {'ProjectType': 'oldProject'}) }}" class="nav-link">les plus anciens</a>
-							</li>
-						{% endif %}
-						<li class="list-group-item d-flex justify-content-between">
-							<a href="{{ path('app_home', {'ProjectType': 'completedProjectsASC'}) }}" class="nav-link">Les plus complétés</a>
+							<a href="{{ path('app_home', {'ProjectType': 'new-projects'}) }}" class="nav-link">Les plus récents</a>
 						</li>
 						<li class="list-group-item d-flex justify-content-between">
-							<a href="{{ path('app_home', {'ProjectType': 'completedProjectsDESC'}) }}" class="nav-link">Les moins complétés</a>
+							<a href="{{ path('app_home', {'ProjectType': 'old-project'}) }}" class="nav-link">Les plus anciens</a>
 						</li>
 					</ul>
 				</div>
