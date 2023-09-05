@@ -88,7 +88,7 @@ class ProjectRepository extends ServiceEntityRepository
             ->addSelect('c') // Charger explicitement la collection 'category' liée à la tâche
             ->where('p.id = :id')
             ->setParameter('id', $id);
-           
+
         switch ($taskType) {
             case 'myTasks':
                 // Ajoutez une condition pour ne récupérer que les tâches de l'utilisateur actuellement connecté
