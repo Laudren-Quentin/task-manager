@@ -14,7 +14,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\VarDumper\VarDumper;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class TaskController extends AbstractController
 {
@@ -56,7 +58,7 @@ class TaskController extends AbstractController
     /**
      * @Route("/project/{projectId}/edit-task/{taskId}", name="app_edit_task")
      */
-    public function editTask($projectId, $taskId, Request $request, ProjectRepository $projectRepository, UserInterface $user, EntityManagerInterface $entityManager): Response
+    public function editTask($projectId, $taskId, Request $request, ProjectRepository $projectRepository, EntityManagerInterface $entityManager): Response
     {
         $project = $projectRepository->find($projectId);
         $task = $entityManager->getRepository(Task::class)->find($taskId);
@@ -87,8 +89,13 @@ class TaskController extends AbstractController
     /**
      * @Route("/task/delete/{id}", name="app_delete_task", methods={"DELETE"})
      */
-    public function delete(int $id, EntityManagerInterface $entityManager): JsonResponse
+    public function delete(int $id, EntityManagerInterface $entityManager, Request $request, CsrfTokenManagerInterface $csrfTokenManager): JsonResponse
     {
+        $csrfToken = $request->headers->get('X-CSRF-TOKEN');
+        if (!$csrfTokenManager->isTokenValid(new CsrfToken('delete-task', $csrfToken))) {
+            throw new AccessDeniedException('Jeton CSRF invalide.');
+        }
+        
         // Récupérez la tâche à supprimer depuis la base de données
         $task = $entityManager->getRepository(Task::class)->find($id);
         if ($task->getCreator() == $this->getUser()) {
@@ -104,8 +111,12 @@ class TaskController extends AbstractController
     /**
      * @Route("/task/validate/{taskId}", name="validateTask")
      */
-    public function validateTask(int $taskId, EntityManagerInterface $entityManager): JsonResponse
+    public function validateTask(int $taskId, EntityManagerInterface $entityManager, Request $request, CsrfTokenManagerInterface $csrfTokenManager): JsonResponse
     {
+        $csrfToken = $request->headers->get('X-CSRF-TOKEN');
+        if (!$csrfTokenManager->isTokenValid(new CsrfToken('validate-task', $csrfToken))) {
+            throw new AccessDeniedException('Jeton CSRF invalide.');
+        }
         $task = $entityManager->getRepository(Task::class)->find($taskId);
         if (!$task) {
             return new JsonResponse(['success' => false, 'message' => 'La tâche n\'existe pas.']);

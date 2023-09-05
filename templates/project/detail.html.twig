@@ -42,6 +42,7 @@
             button.addEventListener('click', function() {
                 const taskId = button.getAttribute('data-task-id');
                 const deleteUrl = `/task/delete/${taskId}`;
+                const crsfTokenDeleteTask = button.getAttribute('data-csrf-token-delete-task');
 
                 // Utilisez la fonction confirm pour demander une confirmation à l'utilisateur
                 if (confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) {
@@ -49,6 +50,7 @@
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': crsfTokenDeleteTask,
                         },
                     })
                     .then(response => {
@@ -77,9 +79,15 @@
         //Validation d'une tâche
         validateTaskButtons.forEach(button => {
             button.addEventListener('click', function() {
-                const taskId = button.getAttribute('data-task-id');
+                let taskId = button.getAttribute('data-task-id');
+                let crsfValidateTask = button.getAttribute('data-csrf-token-validate-task');
                 if (confirm('Voulez-vous valider la tâche en cours ?')) {
-                    fetch(`/task/validate/${taskId}`)
+                    fetch(`/task/validate/${taskId}`, {
+                         headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': crsfValidateTask,
+                        },
+                    })
                     .then(response => response.json())
                     .then(result => {
                         if (result.success) {

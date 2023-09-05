@@ -7,7 +7,7 @@
 				<a href="{{ path('app_edit_task', {'projectId': project.id, 'taskId': task.id}) }}" class="btn btn-warning btn-sm border-2 border-light" title="Modifier la tâche">
 					<i class="fas fa-edit"></i>
 				</a>
-				<button type="button" class="btn btn-danger delete-task-button border-2 border-light" data-task-id="{{ task.id }}">
+				<button type="button" class="btn btn-danger delete-task-button border-2 border-light" data-task-id="{{ task.id }}" data-csrf-token-delete-task="{{ csrf_token('delete-task') }}">
 					<i class="fas fa-trash"></i>
 				</button>
 			</div>
@@ -23,7 +23,7 @@
 				Terminé
 			{% else %}
 				{% if task.assignedUser ==  app.user %}
-					<button class="btn btn-success validate-task-button" data-task-id="{{ task.id }}">
+					<button class="btn btn-success validate-task-button" data-task-id="{{ task.id }}" data-csrf-token-validate-task="{{ csrf_token('validate-task') }}">
 						Valider la tâche
 					</button>
 				{% else %}
