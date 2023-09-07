@@ -72,7 +72,7 @@ class ProjectRepository extends ServiceEntityRepository
                     $qb->orderBy('p.updatedAt', 'ASC');
                     break;
                 default:
-                    $qb->orderBy('p.updatedAt', 'DESC');
+                    $qb->orderBy('p.updatedAt', 'ASC');
                     break;
             }
         

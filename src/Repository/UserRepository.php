@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 /**
  * @extends ServiceEntityRepository<User>
-* @implements PasswordUpgraderInterface<User>
+ * @implements PasswordUpgraderInterface<User>
  *
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
  * @method User|null findOneBy(array $criteria, array $orderBy = null)
@@ -39,6 +39,17 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
+    public function findById($id): array
+    {
+        $query = $this->createQueryBuilder('u')
+            ->select('u')
+            ->andWhere('u.id = :userId')
+            ->setParameter('userId', $id)
+            ->getQuery();
+
+        return $query->getResult(); 
+    }
+
     public function findAllEmails(): array
     {
         $query = $this->createQueryBuilder('u')
@@ -47,7 +58,4 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         return $query->getResult();
     }
-
-    
-
 }

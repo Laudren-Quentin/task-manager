@@ -36,7 +36,7 @@ class HomeController extends AbstractController
             // Get projects where the user is a team member
             $projects = $this->projectRepository->findProjectsByTeamMember($user, $projectType);
         }
-        dd($projects);
+        // dd($projects);
 
         return $this->render('home/index.html.twig', [
             'projects' => $projects,

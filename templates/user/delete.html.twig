@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Supprimer le Compte
+{% endblock %}
+
+{% block body %}
+	<div class="container">
+		<div class="row">
+			<div class="col-md-6 offset-md-3">
+				<h1>Supprimer le Compte</h1>
+				{% for message in app.flashes('danger') %}
+					<div class="alert alert-danger">
+						{{ message }}
+					</div>
+				{% endfor %}
+
+				{{ form_start(form, {'method': 'POST'}) }}
+
+				<div class="mb-3">
+					{{ form_label(form.password, 'Mot de passe actuel', {'label_attr': {'class': 'form-label'}}) }}
+					{{ form_widget(form.password, {'attr': {'class': 'form-control'}}) }}
+				</div>
+
+				{{ form_end(form) }}
+			</div>
+		</div>
+	</div>
+{% endblock %}
