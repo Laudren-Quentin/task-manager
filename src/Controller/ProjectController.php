@@ -122,8 +122,8 @@ class ProjectController extends AbstractController
         if (!$user) {
             return new JsonResponse(['success' => false, 'message' => 'L\'utilisateur n\'existe pas.']);
         }
-        $now = new \DateTimeImmutable();
         // Met à jour toutes les tâches du projet où l'utilisateur est assigné
+        $now = new \DateTimeImmutable();
         foreach ($project->getTasks() as $task) {
             if ($task->getAssignedUser() === $user) {
                 $task->setAssignedUser(null);

@@ -75,6 +75,8 @@ class TaskController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $now = new \DateTimeImmutable();
+            $project = $task->getProject();
+            $project->setUpdatedAt($now);
             $task->setUpdatedAt($now);
             $entityManager->persist($task);
             $entityManager->flush();
@@ -95,10 +97,14 @@ class TaskController extends AbstractController
         if (!$csrfTokenManager->isTokenValid(new CsrfToken('delete-task', $csrfToken))) {
             throw new AccessDeniedException('Jeton CSRF invalide.');
         }
-        
+
         // Récupérez la tâche à supprimer depuis la base de données
         $task = $entityManager->getRepository(Task::class)->find($id);
         if ($task->getCreator() == $this->getUser()) {
+            $now = new \DateTimeImmutable();
+
+            $project = $task->getProject();
+            $project->setUpdatedAt($now);
             $entityManager->remove($task);
             $entityManager->flush();
         } else {
@@ -120,9 +126,14 @@ class TaskController extends AbstractController
         $task = $entityManager->getRepository(Task::class)->find($taskId);
         if (!$task) {
             return new JsonResponse(['success' => false, 'message' => 'La tâche n\'existe pas.']);
-        }elseif($task->getAssignedUser() != $this->getUser()){
+        } elseif ($task->getAssignedUser() != $this->getUser()) {
             return new JsonResponse(['success' => false, 'message' => 'Vous ne pouvez pas valider une tâche qui ne vous est pas assigné']);
         }
+        $now = new \DateTimeImmutable();
+
+        $project = $task->getProject();
+        $project->setUpdatedAt($now);
+        $task->setUpdatedAt($now);
         $task->setCompleted(true);
         $entityManager->flush();
         return new JsonResponse(['success' => true]);
