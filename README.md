@@ -14,13 +14,15 @@ Chose à faire :
 - Créer les Entités et les Repositories Nécéssaire ✅
 - Faire un sytème de connexion pour acceder au site ✅
 - Afficher les projets en lien avec l'utilisateur ✅
-- Afficher les tasks d'un projet quand on clique sur le projet en lien avec l'utilisateur
-- Le Style et le front
+- Afficher les tasks d'un projet quand on clique sur le projet en lien avec l'utilisateur ✅
+- Le Style et le front ✅
 
   USER
-- l'utilisateur peut consulter les projets auquels il fait parti
-- l'utilisateur peut consulter les tâches associées à un projet
+- l'utilisateur peut consulter les projets auquels il fait parti ✅
+- l'utilisateur peut consulter les tâches associées à un projet ✅
 - L'utilisateur à qui la tache a été assigné doit pouvoir validé cette dernière quand il l'a terminé ✅
+- L'utilisateur peut supprimer son compte ✅
+- L'utilisateur peut modifier son compte ✅
 
   ADMIN
 - les admins peuvent créer des comptes ( admin et user ) ✅
